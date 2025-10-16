@@ -1,131 +1,185 @@
 /**
- * Global Payments SDK Template - Node.js
- * 
- * This Express application provides a starting template for Global Payments SDK integration.
- * Customize the endpoints and logic below for your specific use case.
+ * ACH/eCheck Payment Processing Server - GP API
+ *
+ * This Express application demonstrates ACH/eCheck payment processing using the Global Payments SDK
+ * with GP API for direct bank account information processing.
+ * This approach is suitable for server-side processing where PCI compliance requirements are met.
  */
 
 import express from 'express';
 import * as dotenv from 'dotenv';
 import {
     ServicesContainer,
-    PorticoConfig,
+    GpApiConfig,
+    AccessTokenInfo,
     Address,
-    CreditCardData,
-    ApiError
+    ECheck,
+    AccountType,
+    SecCode,
+    ApiError,
+    Environment,
+    Channel,
+    TransactionStatus
 } from 'globalpayments-api';
 
-// Load environment variables from .env file
 dotenv.config();
 
-/**
- * Initialize Express application with necessary middleware
- */
 const app = express();
 const port = process.env.PORT || 8000;
 
-app.use(express.static('.')); // Serve static files
-app.use(express.urlencoded({ extended: true })); // Parse form data
-app.use(express.json()); // Parse JSON requests
+app.use(express.static('.'));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-// Configure Global Payments SDK with credentials and settings
-const config = new PorticoConfig();
-config.secretApiKey = process.env.SECRET_API_KEY;
-config.serviceUrl = 'https://cert.api2.heartlandportico.com'; // Use production URL for live transactions
+const config = new GpApiConfig();
+config.appId = process.env.APP_ID;
+config.appKey = process.env.APP_KEY;
+config.environment = Environment.TEST;
+config.channel = Channel.CardNotPresent;
+config.country = 'US';
+
+const accessTokenInfo = new AccessTokenInfo();
+accessTokenInfo.transactionProcessingAccountName = 'transaction_processing';
+accessTokenInfo.riskAssessmentAccountName = 'EOS_RiskAssessment';
+config.accessTokenInfo = accessTokenInfo;
+
 ServicesContainer.configureService(config);
 
 /**
- * Utility function to sanitize postal code
- * Customize validation logic as needed for your use case
+ * Sanitize postal code by removing invalid characters
+ * @param {string} postalCode - The postal code to sanitize
+ * @returns {string} The sanitized postal code
  */
 const sanitizePostalCode = (postalCode) => {
+    if (!postalCode) return '';
     return postalCode.replace(/[^a-zA-Z0-9-]/g, '').slice(0, 10);
 };
 
 /**
- * Config endpoint - provides public API key for client-side use
- * Customize response data as needed
+ * Validate routing number using the standard checksum algorithm
+ *
+ * @param {string} routingNumber - The 9-digit routing number to validate
+ * @returns {boolean} True if the routing number is valid, false otherwise
  */
+const validateRoutingNumber = (routingNumber) => {
+    if (!routingNumber || routingNumber.length !== 9 || !/^\d{9}$/.test(routingNumber)) {
+        return false;
+    }
+
+    const digits = routingNumber.split('').map(Number);
+    const checksum = (
+        3 * (digits[0] + digits[3] + digits[6]) +
+        7 * (digits[1] + digits[4] + digits[7]) +
+        1 * (digits[2] + digits[5] + digits[8])
+    ) % 10;
+
+    return checksum === 0;
+};
+
+/**
+ * Sanitize account number by removing non-numeric characters
+ *
+ * @param {string} accountNumber - The account number to sanitize
+ * @returns {string} The sanitized account number containing only digits
+ */
+const sanitizeAccountNumber = (accountNumber) => {
+    if (!accountNumber) return '';
+    return accountNumber.replace(/[^0-9]/g, '');
+};
+
 app.get('/config', (req, res) => {
     res.json({
         success: true,
         data: {
-            publicApiKey: process.env.PUBLIC_API_KEY
-            // Add other configuration data as needed
+            directEntry: true,
+            message: 'Direct bank account entry enabled'
         }
     });
 });
 
-/**
- * Example payment processing endpoint
- * Customize this endpoint for your specific payment flow
- */
 app.post('/process-payment', async (req, res) => {
     try {
-        // TODO: Add your payment processing logic here
-        // Example implementation for basic charge:
-        
-        if (!req.body.payment_token) {
-            throw new Error('Payment token is required');
+        const requiredFields = ['account_number', 'routing_number', 'amount',
+                               'account_type', 'check_holder_name'];
+        for (const field of requiredFields) {
+            if (!req.body[field]) {
+                throw new Error(`Missing required field: ${field}`);
+            }
         }
 
-        const card = new CreditCardData();
-        card.token = req.body.payment_token;
+        const amount = parseFloat(req.body.amount);
+        if (isNaN(amount) || amount <= 0) {
+            throw new Error('Invalid amount');
+        }
 
-        // Customize amount and other parameters as needed
-        const amount = req.body.amount || 10.00;
+        const routingNumber = req.body.routing_number.trim();
+        if (!validateRoutingNumber(routingNumber)) {
+            throw new Error('Invalid routing number');
+        }
 
-        // Add billing address if needed
-        if (req.body.billing_zip) {
-            const address = new Address();
-            address.postalCode = sanitizePostalCode(req.body.billing_zip);
-            
-            const response = await card.charge(amount)
-                .withAllowDuplicates(true)
-                .withCurrency('USD')
-                .withAddress(address)
-                .execute();
-                
-            // Handle response...
-            res.json({
-                success: true,
-                message: 'Payment processed successfully',
-                data: { transactionId: response.transactionId }
-            });
-        } else {
-            // Process without address
-            const response = await card.charge(amount)
-                .withAllowDuplicates(true)
-                .withCurrency('USD')
-                .execute();
-                
-            res.json({
-                success: true,
-                message: 'Payment processed successfully',
-                data: { transactionId: response.transactionId }
+        const accountNumber = sanitizeAccountNumber(req.body.account_number);
+        if (!accountNumber || accountNumber.length < 4) {
+            throw new Error('Invalid account number');
+        }
+
+        const accountTypeStr = req.body.account_type.toLowerCase();
+        const accountType = accountTypeStr === 'savings' ? AccountType.Savings : AccountType.Checking;
+
+        const address = new Address();
+        address.streetAddress1 = req.body.street_address || '';
+        address.city = req.body.city || '';
+        address.state = req.body.state || '';
+        address.postalCode = sanitizePostalCode(req.body.billing_zip || '');
+        address.country = 'US';
+
+        const check = new ECheck();
+        check.accountNumber = accountNumber;
+        check.routingNumber = routingNumber;
+        check.accountType = accountType;
+        check.secCode = SecCode.WEB;
+        check.checkName = req.body.check_holder_name;
+        check.bankAddress = address;
+
+        const response = await check.charge(amount)
+            .withCurrency('USD')
+            .withAddress(address)
+            .execute();
+
+        if (response.responseCode !== 'SUCCESS' || response.responseMessage !== TransactionStatus.CAPTURED) {
+            return res.status(400).json({
+                success: false,
+                message: 'Payment processing failed',
+                error: {
+                    code: 'PAYMENT_DECLINED',
+                    details: response.responseMessage || 'Unknown error'
+                }
             });
         }
 
+        res.json({
+            success: true,
+            message: `Payment successful! Transaction ID: ${response.transactionId}`,
+            data: {
+                transactionId: response.transactionId,
+                responseCode: response.responseCode,
+                responseMessage: response.responseMessage
+            }
+        });
     } catch (error) {
-        res.status(500).json({
+        console.error('Payment processing error:', error);
+
+        const errorCode = error instanceof ApiError ? 'API_ERROR' : 'SERVER_ERROR';
+        res.status(400).json({
             success: false,
             message: 'Payment processing failed',
-            error: error.message
+            error: {
+                code: errorCode,
+                details: error.message
+            }
         });
     }
 });
 
-/**
- * Add your custom endpoints here
- * Examples:
- * - app.post('/authorize', ...) // Authorization only
- * - app.post('/capture', ...)   // Capture authorized payment
- * - app.post('/refund', ...)    // Process refund
- * - app.get('/transaction/:id', ...) // Get transaction details
- */
-
-// Start the server
-app.listen(port, '0.0.0.0', () => {
-    console.log(`Server running at http://localhost:${port}`);
-    console.log(`Customize this template for your use case!`);
+app.listen(port, () => {
+    console.log(`ACH/eCheck GP API server running at http://localhost:${port}`);
 });
