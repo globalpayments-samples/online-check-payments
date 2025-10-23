@@ -45,8 +45,8 @@ public class Program
     {
         var config = new GpApiConfig
         {
-            AppId = System.Environment.GetEnvironmentVariable("APP_ID"),
-            AppKey = System.Environment.GetEnvironmentVariable("APP_KEY"),
+            AppId = System.Environment.GetEnvironmentVariable("GP_API_APP_ID"),
+            AppKey = System.Environment.GetEnvironmentVariable("GP_API_APP_KEY"),
             Environment = Environment.TEST,
             Channel = Channel.CardNotPresent,
             Country = "US",

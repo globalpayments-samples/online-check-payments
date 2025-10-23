@@ -32,8 +32,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const config = new GpApiConfig();
-config.appId = process.env.APP_ID;
-config.appKey = process.env.APP_KEY;
+config.appId = process.env.GP_API_APP_ID;
+config.appKey = process.env.GP_API_APP_KEY;
 config.environment = Environment.TEST;
 config.channel = Channel.CardNotPresent;
 config.country = 'US';

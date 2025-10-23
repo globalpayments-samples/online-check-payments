@@ -56,8 +56,8 @@ public class ProcessPaymentServlet extends HttpServlet {
     private void configureSDK() {
         try {
             GpApiConfig config = new GpApiConfig();
-            config.setAppId(dotenv.get("APP_ID"));
-            config.setAppKey(dotenv.get("APP_KEY"));
+            config.setAppId(dotenv.get("GP_API_APP_ID"));
+            config.setAppKey(dotenv.get("GP_API_APP_KEY"));
             config.setEnvironment(Environment.TEST);
             config.setChannel(Channel.CardNotPresent);
             config.setCountry("US");
