@@ -1,68 +1,156 @@
 # ACH/eCheck Online Payment Processing
 
-This project demonstrates ACH/eCheck payment processing using the Global Payments GP API across multiple programming languages. Each implementation provides secure electronic check processing with direct bank account entry, routing number validation, and comprehensive customer data integration.
+A comprehensive multi-language demonstration of ACH/eCheck payment processing using the Global Payments GP API. This example showcases secure electronic check payments with direct bank account entry, routing number validation, and full customer data integration across multiple programming languages.
 
-## Available Implementations
+## 🚀 Features
 
-- [.NET Core](./dotnet/) - ASP.NET Core web application
-- [Java](./java/) - Jakarta EE servlet-based web application
-- [Node.js](./nodejs/) - Express.js web application
-- [PHP](./php/) - PHP web application
-
-## Key Features
-
-### ACH/eCheck Processing
-- **Direct Bank Account Entry** - Secure processing with routing and account numbers
-- **GP API Integration** - Server-side payment processing using Global Payments GP API
+### Core Payment Capabilities
+- **Direct Bank Account Entry** - Process payments using account and routing numbers directly
 - **Account Type Support** - Both checking and savings account processing
-- **Routing Number Validation** - Industry-standard checksum algorithm validation
+- **Routing Number Validation** - Industry-standard ABA checksum algorithm validation
 - **Account Number Sanitization** - Automatic cleaning and validation of account numbers
+- **Customer Data Integration** - Associate full billing and contact information with each payment
 
-### Customer Data Integration
-- **Complete Customer Information** - Name, email, and contact details
-- **Billing Address Support** - Full address capture including street, city, state, zip
-- **Bank Address Requirements** - Mandatory streetAddress1 for bank transfer compliance
+### Development & Testing
+- **Test Account Support** - Built-in JP Morgan Chase sandbox routing number (021000021)
+- **Comprehensive Web Interface** - Complete UI for ACH payment submission and result display
+- **Global Payments GP API Integration** - Server-side payment processing via GP API
 
-### Security & Validation
-- **Input Sanitization** - Comprehensive data cleaning and validation
-- **Error Handling** - Robust error management with meaningful messages
-- **Transaction Validation** - Response code verification (SUCCESS + CAPTURED status)
-- **PCI Compliance Ready** - Structure supports tokenization for production use
+### Technical Features
+- **Consistent API Structure** - Identical endpoints and functionality across all language implementations
+- **Environment Configuration** - Secure credential management with .env files
+- **Bank Address Compliance** - Mandatory streetAddress1 handling per GP API requirements
+- **Transaction Validation** - Dual-criteria response verification (SUCCESS + CAPTURED)
 
-## Quick Start
+## 🌐 Available Implementations
 
-1. **Choose your language** - Navigate to any implementation directory (nodejs, php, java, dotnet)
-2. **Set up credentials** - Copy `.env.sample` to `.env` and add your GP API credentials
-3. **Run the server** - Execute `./run.sh` to install dependencies and start the server
-4. **Test the integration** - Open your browser to the specified port and process a test payment
+Each implementation provides identical functionality with language-specific best practices:
 
-## GP API Configuration
+| Language | Framework | Requirements | Status |
+|----------|-----------|--------------|--------|
+| **[PHP](./php/)** - ([Preview](https://githubbox.com/globalpayments-samples/online-check-payments/tree/main/php)) | Native PHP | PHP 7.4+, Composer | ✅ Complete |
+| **[Node.js](./nodejs/)** - ([Preview](https://githubbox.com/globalpayments-samples/online-check-payments/tree/main/nodejs)) | Express.js | Node.js 18+, npm | ✅ Complete |
+| **[.NET](./dotnet/)** - ([Preview](https://githubbox.com/globalpayments-samples/online-check-payments/tree/main/dotnet)) | ASP.NET Core | .NET 9.0+ | ✅ Complete |
+| **[Java](./java/)** - ([Preview](https://githubbox.com/globalpayments-samples/online-check-payments/tree/main/java)) | Jakarta EE | Java 11+, Maven | ✅ Complete |
 
-All implementations use the following environment variables:
+## 🏗️ Architecture Overview
 
-```bash
-# GP API Credentials
-APP_ID=your_gp_api_app_id_here
-APP_KEY=your_gp_api_app_key_here
+### Frontend Architecture
+- **Direct Entry Form** - Bank account and routing number input with real-time validation
+- **Customer Information Capture** - Full name, email, and billing address fields
+- **Responsive Web Interface** - Clean payment form with status feedback
+- **Client-Side Validation** - Routing number checksum verification before submission
 
-# Environment (sandbox or production)
-GP_API_ENVIRONMENT=sandbox
+### Backend Architecture
+- **RESTful API Design** - Consistent endpoints across all implementations
+- **GP API eCheck Processing** - Secure ACH transactions via Global Payments SDK
+- **Input Sanitization** - Account number and routing number cleaning
+- **Bank Address Handling** - Dual address assignment required by GP API ACH spec
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/config` | Returns frontend configuration for client initialization |
+| `POST` | `/process-payment` | Processes ACH/eCheck payment via GP API |
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Global Payments account with GP API credentials ([Sign up here](https://developer.globalpay.com/))
+- Development environment for your chosen language
+- Package manager (npm, composer, maven, or dotnet)
+
+### Setup Instructions
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/globalpayments-samples/online-check-payments.git
+   cd online-check-payments
+   ```
+
+2. **Choose your implementation**
+   ```bash
+   cd php  # or nodejs, dotnet, java
+   ```
+
+3. **Configure environment**
+   ```bash
+   cp .env.sample .env
+   # Edit .env with your GP API credentials:
+   # APP_ID=your_gp_api_app_id_here
+   # APP_KEY=your_gp_api_app_key_here
+   # GP_API_ENVIRONMENT=sandbox
+   ```
+
+4. **Install dependencies and run**
+   ```bash
+   ./run.sh
+   ```
+
+   Or manually per language:
+   ```bash
+   # PHP
+   composer install && php -S localhost:8000
+
+   # Node.js
+   npm install && npm start
+
+   # .NET
+   dotnet restore && dotnet run
+
+   # Java
+   mvn clean compile cargo:run
+   ```
+
+5. **Access the application**
+   Open [http://localhost:8000](http://localhost:8000) in your browser
+
+## 🧪 Development & Testing
+
+### Test Bank Account Details
+For sandbox testing, use the following credentials:
+
+| Field | Value |
+|-------|-------|
+| **Routing Number** | 021000021 (JP Morgan Chase) |
+| **Account Number** | Any 4–17 digit number |
+| **Account Type** | `checking` or `savings` |
+
+### Test Amounts
+Different amounts trigger different sandbox responses. Consult the [GP API documentation](https://developer.globalpay.com/api) for specific test scenarios.
+
+### Routing Number Validation
+All implementations validate routing numbers using the ABA standard checksum algorithm:
 ```
+Checksum = (3 × (d₁+d₄+d₇) + 7 × (d₂+d₅+d₈) + 1 × (d₃+d₆+d₉)) mod 10
+```
+Valid routing numbers produce a checksum of `0`.
 
-### GP API Settings
-- **Environment**: TEST/Sandbox
-- **Channel**: CardNotPresent
-- **Country**: US
-- **Accounts**:
-  - Transaction Processing: `transaction_processing`
-  - Risk Assessment: `EOS_RiskAssessment`
+## 💳 Payment Flow
 
-## API Endpoints
+### 1. Customer Input
+- User enters bank account number, routing number, and account type
+- User provides name, email, and full billing address
 
-Each implementation provides the following endpoints:
+### 2. Client-Side Validation
+- Routing number checksum validated before submission
+- Account number sanitized (digits only, 4–17 characters)
+
+### 3. Backend Processing
+- Server creates an `ECheck` object with account details and bank address
+- Calls `eCheck.charge(amount)` via the GP API SDK
+- Validates response: `responseCode === "SUCCESS"` and `responseMessage === "CAPTURED"`
+
+### 4. Response
+- Success: returns transaction ID, amount, currency, and status
+- Failure: returns structured error with code and details
+
+## 🔧 API Reference
 
 ### GET /config
-Returns configuration information for the client
+
+Returns frontend configuration.
 
 **Response:**
 ```json
@@ -76,21 +164,25 @@ Returns configuration information for the client
 ```
 
 ### POST /process-payment
-Processes an ACH/eCheck payment using direct bank account information
+
+Processes an ACH/eCheck payment.
 
 **Request Parameters:**
-- `amount` (decimal, required) - Payment amount
-- `account_number` (string, required) - Bank account number
-- `routing_number` (string, required) - 9-digit ABA routing number
-- `account_type` (string, required) - "checking" or "savings"
-- `check_holder_name` (string, required) - Name on the account
-- `first_name` (string, required) - Customer first name
-- `last_name` (string, required) - Customer last name
-- `email` (string, required) - Customer email address
-- `street_address` (string, required) - Street address (line 1)
-- `city` (string, required) - City
-- `state` (string, required) - 2-letter state code
-- `billing_zip` (string, required) - ZIP/postal code
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `amount` | decimal | ✅ | Payment amount |
+| `account_number` | string | ✅ | Bank account number (4–17 digits) |
+| `routing_number` | string | ✅ | 9-digit ABA routing number |
+| `account_type` | string | ✅ | `checking` or `savings` |
+| `check_holder_name` | string | ✅ | Name on the account |
+| `first_name` | string | ✅ | Customer first name |
+| `last_name` | string | ✅ | Customer last name |
+| `email` | string | ✅ | Customer email address |
+| `street_address` | string | ✅ | Street address (required by GP API ACH) |
+| `city` | string | ✅ | City |
+| `state` | string | ✅ | 2-letter state code |
+| `billing_zip` | string | ✅ | ZIP/postal code |
 
 **Response (Success):**
 ```json
@@ -98,7 +190,7 @@ Processes an ACH/eCheck payment using direct bank account information
   "success": true,
   "message": "ACH payment processed successfully",
   "data": {
-    "transaction_id": "txn_xxx",
+    "transaction_id": "TRN_xxx",
     "amount": 10.00,
     "currency": "USD",
     "status": "approved",
@@ -120,122 +212,50 @@ Processes an ACH/eCheck payment using direct bank account information
 }
 ```
 
-## Use Cases
+## 🔧 Customization
 
-This implementation can be adapted for various ACH payment scenarios:
+### Extending Functionality
+Each implementation provides a solid foundation for:
+- **Recurring ACH Payments** - Add scheduling and stored payment method support
+- **Batch Processing** - Queue multiple ACH transactions for bulk settlement
+- **Refunds & Voids** - Implement reversal endpoints using transaction IDs
+- **Webhook Handling** - Receive async ACH settlement notifications
+- **Enhanced Validation** - Add NACHA-compliant account verification flows
 
-- **Bill Payments** - Utility bills, invoices, and recurring charges
-- **Direct Debit** - Subscription services and membership fees
-- **One-Time Payments** - Large purchases and service payments
-- **B2B Payments** - Vendor payments and supplier settlements
-- **Recurring Payments** - Scheduled automatic withdrawals
-- **Payment Plans** - Installment and subscription billing
+### Production Considerations
+Before deploying to production:
+- **Security** - Implement input validation, rate limiting, and HTTPS
+- **Logging** - Add secure logging with PII protection (never log account numbers)
+- **Compliance** - Ensure NACHA and PCI DSS compliance
+- **Error Handling** - Surface meaningful errors without exposing internals
+- **Authentication** - Add user authentication and access control
 
-## Prerequisites
+## 📚 Documentation
 
-- Global Payments account with GP API credentials ([Sign up here](https://developer.globalpay.com/))
-- Development environment for your chosen language:
-  - **Node.js**: v14.x or later with npm
-  - **PHP**: v7.4 or later with Composer
-  - **Java**: JDK 11 or later with Maven
-  - **.NET**: .NET 6.0 or later
+Each language implementation includes detailed documentation:
+- **Setup Instructions** - Environment configuration and dependency installation
+- **API Documentation** - Endpoint specifications with request/response examples
+- **Code Structure** - File organization and architecture notes
+- **Troubleshooting** - Common issues and solutions
 
-## Implementation Details
+## 🤝 Contributing
 
-### Routing Number Validation
-All implementations include routing number validation using the ABA standard checksum algorithm:
-```
-Checksum = (3 × (d₁ + d₄ + d₇) + 7 × (d₂ + d₅ + d₈) + 1 × (d₃ + d₆ + d₉)) mod 10
-```
-Valid routing numbers produce a checksum of 0.
+This project serves as a reference implementation for GP API ACH/eCheck integration. When contributing:
+- Maintain consistency across all language implementations
+- Follow each language's best practices and conventions
+- Ensure thorough testing in the sandbox environment
+- Update documentation to reflect any changes
 
-### Transaction Response Validation
-Successful ACH transactions must meet both criteria:
-- `responseCode` === "SUCCESS"
-- `responseMessage` === "CAPTURED" (TransactionStatus.CAPTURED)
+## 📄 License
 
-### Bank Address Requirements
-The GP API requires `streetAddress1` (bank_transfer.bank.address.line_1) for ACH transactions. All implementations set both:
-- `bankAddress` property on the eCheck/ECheck object
-- `withAddress()` for billing address
+MIT License — see [LICENSE](./LICENSE) for details.
 
-## Security Considerations
+## 🆘 Support
 
-### Production Deployment
-For production use, implement the following security measures:
+- **Global Payments Developer Portal**: [https://developer.globalpay.com/](https://developer.globalpay.com/)
+- **GP API Reference**: [https://developer.globalpay.com/api](https://developer.globalpay.com/api)
+- **SDK Documentation**: Language-specific SDK guides in each implementation directory
 
-1. **Input Validation**
-   - Validate all user inputs server-side
-   - Sanitize data before processing
-   - Implement rate limiting on payment endpoints
+---
 
-2. **Data Protection**
-   - Use HTTPS/TLS for all connections
-   - Never log sensitive banking information
-   - Implement proper session management
-   - Consider tokenization for recurring payments
-
-3. **Compliance**
-   - Follow PCI DSS guidelines for payment data
-   - Implement proper audit logging
-   - Ensure NACHA compliance for ACH transactions
-   - Review security best practices regularly
-
-4. **Error Handling**
-   - Don't expose internal error details to users
-   - Implement comprehensive logging for debugging
-   - Monitor failed transactions for fraud patterns
-
-5. **Access Control**
-   - Secure API credentials (never commit to version control)
-   - Use environment variables for configuration
-   - Implement authentication and authorization
-   - Regular credential rotation
-
-## Testing
-
-### Test Bank Account Numbers
-For sandbox testing, use these test account details:
-- **Routing Number**: 021000021 (JP Morgan Chase)
-- **Account Number**: Any 4-17 digit number
-- **Account Type**: checking or savings
-
-### Test Amounts
-Different amounts can trigger different responses in sandbox mode. Consult the GP API documentation for specific test scenarios.
-
-## Support & Resources
-
-- **Documentation**: [Global Payments Developer Portal](https://developer.globalpay.com/)
-- **API Reference**: [GP API Documentation](https://developer.globalpay.com/api)
-- **SDKs**: [Official SDKs](https://developer.globalpay.com/sdks)
-- **Support**: Contact Global Payments developer support
-
-## Language-Specific Notes
-
-### PHP Implementation
-- PSR-12 coding standards
-- Composer for dependency management
-- PaymentUtils class for shared functionality
-- Built-in routing number validation
-
-### Java Implementation
-- Jakarta EE servlet-based architecture
-- Maven for dependency management
-- Customer data object required for transactions
-- Comprehensive error handling with JSON responses
-
-### Node.js Implementation
-- Express.js framework
-- ES6 module syntax
-- Async/await for payment processing
-- ECheck class requires bankAddress property
-
-### .NET Implementation
-- ASP.NET Core minimal API
-- NuGet for package management
-- Environment variable configuration with dotenv
-- Strongly-typed models for request/response
-
-## License
-
-This project is provided as-is for demonstration purposes. Review the Global Payments SDK license terms for production use.
+**Note**: This is a demonstration application for development and testing purposes. For production use, implement additional security measures, error handling, and compliance requirements specific to your use case.
