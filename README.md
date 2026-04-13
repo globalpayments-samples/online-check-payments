@@ -57,7 +57,7 @@ Each implementation provides identical functionality with language-specific best
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Global Payments account with GP API credentials ([Sign up here](https://developer.globalpay.com/))
+- Global Payments account with GP API credentials ([Sign up here](https://developer.globalpayments.com/))
 - Development environment for your chosen language
 - Package manager (npm, composer, maven, or dotnet)
 
@@ -118,7 +118,7 @@ For sandbox testing, use the following credentials:
 | **Account Type** | `checking` or `savings` |
 
 ### Test Amounts
-Different amounts trigger different sandbox responses. Consult the [GP API documentation](https://developer.globalpay.com/api) for specific test scenarios.
+Different amounts trigger different sandbox responses. Consult the [GP API documentation](https://developer.globalpayments.com/api/references-overview) for specific test scenarios.
 
 ### Routing Number Validation
 All implementations validate routing numbers using the ABA standard checksum algorithm:
@@ -252,8 +252,8 @@ MIT License — see [LICENSE](./LICENSE) for details.
 
 ## 🆘 Support
 
-- **Global Payments Developer Portal**: [https://developer.globalpay.com/](https://developer.globalpay.com/)
-- **GP API Reference**: [https://developer.globalpay.com/api](https://developer.globalpay.com/api)
+- **Global Payments Developer Portal**: [https://developer.globalpayments.com/](https://developer.globalpayments.com/)
+- **GP API Reference**: [https://developer.globalpayments.com/api](https://developer.globalpayments.com/api/references-overview)
 - **SDK Documentation**: Language-specific SDK guides in each implementation directory
 
 ---
