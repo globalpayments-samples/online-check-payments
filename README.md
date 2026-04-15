@@ -57,7 +57,7 @@ Each implementation provides identical functionality with language-specific best
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Global Payments account with GP API credentials ([Sign up here](https://developer.globalpay.com/))
+- Global Payments account with GP API credentials ([Sign up here](https://developer.globalpayments.com/))
 - Development environment for your chosen language
 - Package manager (npm, composer, maven, or dotnet)
 
@@ -118,7 +118,7 @@ For sandbox testing, use the following credentials:
 | **Account Type** | `checking` or `savings` |
 
 ### Test Amounts
-Different amounts trigger different sandbox responses. Consult the [GP API documentation](https://developer.globalpay.com/api) for specific test scenarios.
+Different amounts trigger different sandbox responses. Consult the [GP API documentation](https://developer.globalpayments.com/api/references-overview) for specific test scenarios.
 
 ### Routing Number Validation
 All implementations validate routing numbers using the ABA standard checksum algorithm:
@@ -230,6 +230,15 @@ Before deploying to production:
 - **Error Handling** - Surface meaningful errors without exposing internals
 - **Authentication** - Add user authentication and access control
 
+## Security Considerations
+
+- **No Card Data** — ACH/eCheck uses bank account numbers, not card data, but still requires PCI-equivalent care
+- **Never Log Account Numbers** — Mask or omit full account/routing numbers in logs
+- **Credential Isolation** — Store GP API keys in `.env` files, never commit to version control
+- **HTTPS Required** — Always use TLS in production environments
+- **Input Validation** — Routing numbers validated with ABA checksum; account numbers sanitized to digits only
+- **NACHA Compliance** — Production ACH processing must follow NACHA operating rules
+
 ## 📚 Documentation
 
 Each language implementation includes detailed documentation:
@@ -250,12 +259,22 @@ This project serves as a reference implementation for GP API ACH/eCheck integrat
 
 MIT License — see [LICENSE](./LICENSE) for details.
 
-## 🆘 Support
+## Resources
 
-- **Global Payments Developer Portal**: [https://developer.globalpay.com/](https://developer.globalpay.com/)
-- **GP API Reference**: [https://developer.globalpay.com/api](https://developer.globalpay.com/api)
-- **SDK Documentation**: Language-specific SDK guides in each implementation directory
+- [Global Payments Developer Portal](https://developer.globalpayments.com/)
+- [API Reference](https://developer.globalpayments.com/api/references-overview)
+- [Test Cards](https://developer.globalpayments.com/resources/test-cards)
+- [PHP SDK](https://github.com/globalpayments/php-sdk)
+- [Node.js SDK](https://github.com/globalpayments/node-sdk)
+- [Java SDK](https://github.com/globalpayments/java-sdk)
+- [.NET SDK](https://github.com/globalpayments/dotnet-sdk)
 
----
+## Community
 
-**Note**: This is a demonstration application for development and testing purposes. For production use, implement additional security measures, error handling, and compliance requirements specific to your use case.
+- 🌐 **Developer Portal** — [developer.globalpayments.com](https://developer.globalpayments.com)
+- 💬 **Discord** — [Join the community](https://discord.gg/myER9G9qkc)
+- 📋 **GitHub Discussions** — [github.com/orgs/globalpayments/discussions](https://github.com/orgs/globalpayments/discussions)
+- 📧 **Newsletter** — [Subscribe](https://www.globalpayments.com/en-gb/modals/newsletter)
+- 💼 **LinkedIn** — [Global Payments for Developers](https://www.linkedin.com/showcase/global-payments-for-developers/posts/?feedView=all)
+
+Have a question or found a bug? [Open an issue](https://github.com/globalpayments-samples/online-check-payments/issues) or reach out at [communityexperience@globalpay.com](mailto:communityexperience@globalpay.com).
