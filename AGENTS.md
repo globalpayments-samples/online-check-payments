@@ -69,7 +69,7 @@
 | Routing number | `021000021` | JP Morgan Chase sandbox routing number used in the root README and all frontend forms. |
 | Account number | Any 4-17 digit number | The servers sanitize non-digits and reject values shorter than 4 digits. |
 | Account type | `checking` or `savings` | Mapped to the SDK account type enum before charging. |
-| Real credentials | <https://developer.globalpay.com/> | Use GP API sandbox credentials from the developer portal; the repo does not include test API keys. |
+| Real credentials | <https://developer.globalpayments.com/> | Use GP API sandbox credentials from the developer portal; the repo does not include test API keys. |
 
 ## Architecture Summary
 
