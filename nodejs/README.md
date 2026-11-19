@@ -42,7 +42,7 @@ This example demonstrates card payment processing using Express.js and the Globa
 
 ### Server Setup
 The application uses Express.js to create a web server that:
-- Serves static files
+- Serves the payment page (index.html)
 - Processes payment requests
 - Provides configuration endpoint for client-side SDK
 - Handles JSON and form-encoded requests
