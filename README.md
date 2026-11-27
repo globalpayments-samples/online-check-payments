@@ -100,7 +100,7 @@ Each implementation provides identical functionality with language-specific best
    dotnet restore && dotnet run
 
    # Java
-   mvn clean compile cargo:run
+   mvn clean package cargo:run
    ```
 
 5. **Access the application**
