@@ -1,6 +1,6 @@
-# .NET Card Payment Example
+# .NET ACH Payment Example
 
-This example demonstrates card payment processing using ASP.NET Core and the Global Payments SDK.
+This example demonstrates ACH (eCheck) payment processing using ASP.NET Core and the Global Payments SDK.
 
 ## Requirements
 
@@ -21,8 +21,8 @@ This example demonstrates card payment processing using ASP.NET Core and the Glo
 2. Copy `.env.sample` to `.env`
 3. Update `.env` with your Global Payments credentials:
    ```
-   PUBLIC_API_KEY=pk_test_xxx
-   SECRET_API_KEY=sk_test_xxx
+   GP_API_APP_ID=your_gp_api_app_id
+   GP_API_APP_KEY=your_gp_api_app_key
    ```
 4. Install dependencies:
    ```bash
@@ -46,18 +46,17 @@ The application uses ASP.NET Core's minimal API approach to create a lightweight
 - Provides configuration endpoint for client-side SDK
 
 ### SDK Configuration
-The Global Payments SDK is configured using environment variables and the PorticoConfig class:
-- Loads credentials from .env file
-- Sets up service URL for API communication
-- Configures developer identification
+The Global Payments SDK is configured using environment variables and the GpApiConfig class:
+- Loads GP_API_APP_ID and GP_API_APP_KEY from the .env file
+- Builds a GpApiConfig for the sandbox (TEST) environment, channel CNP, country US
 
 ### Payment Processing
 Payment processing flow:
-1. Client submits payment token and billing zip
-2. Server creates CreditCardData with token
-3. Creates Address with postal code
-4. Processes $10 USD charge
-5. Returns success/error response
+1. Client submits the bank account, routing number, account type, account holder name and billing address
+2. Server checks the routing number checksum and strips non digits from the account number
+3. Creates an eCheck with SEC code WEB and the bank address
+4. Charges the amount in USD through GP API
+5. Returns success only when GP API answers SUCCESS and CAPTURED
 
 ### Error Handling
 Implements comprehensive error handling:
@@ -68,34 +67,23 @@ Implements comprehensive error handling:
 ## API Endpoints
 
 ### GET /config
-Returns public API key for client-side SDK initialization.
-
-Response:
-```json
-{
-    "publicApiKey": "pk_test_xxx"
-}
-```
+Tells the page that direct bank entry is enabled.
 
 ### POST /process-payment
-Processes a payment using the provided token and billing information.
+Charges a bank account (ACH) through GP API.
 
-Request Parameters:
-- `payment_token` (string, required) - Token from client-side SDK
-- `billing_zip` (string, required) - Billing postal code
+Request body (JSON):
+- `amount`, `account_number`, `routing_number`, `account_type` (`checking` or `savings`), `check_holder_name` (required)
+- `street_address`, `city`, `state`, `billing_zip`, `first_name`, `last_name`, `email` (optional)
 
 Response (Success):
 ```json
-{
-    "message": "Payment successful! Transaction ID: xxx"
-}
+{"success": true, "message": "Payment successful! Transaction ID: TRN_xxx", "data": {"transactionId": "TRN_xxx", "responseCode": "SUCCESS", "responseMessage": "CAPTURED"}}
 ```
 
 Response (Error):
 ```json
-{
-    "detail": "Error message"
-}
+{"success": false, "message": "Payment processing failed", "error": {"code": "VALIDATION_ERROR or API_ERROR", "details": "Invalid routing number"}}
 ```
 
 ## Security Considerations

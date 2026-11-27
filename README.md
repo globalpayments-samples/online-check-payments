@@ -78,8 +78,8 @@ Each implementation provides identical functionality with language-specific best
    ```bash
    cp .env.sample .env
    # Edit .env with your GP API credentials:
-   # APP_ID=your_gp_api_app_id_here
-   # APP_KEY=your_gp_api_app_key_here
+   # GP_API_APP_ID=your_gp_api_app_id_here
+   # GP_API_APP_KEY=your_gp_api_app_key_here
    # GP_API_ENVIRONMENT=sandbox
    ```
 
@@ -188,17 +188,16 @@ Processes an ACH/eCheck payment.
 ```json
 {
   "success": true,
-  "message": "ACH payment processed successfully",
+  "message": "Payment successful! Transaction ID: TRN_xxx",
   "data": {
-    "transaction_id": "TRN_xxx",
-    "amount": 10.00,
-    "currency": "USD",
-    "status": "approved",
-    "response_code": "SUCCESS",
-    "response_message": "CAPTURED"
+    "transactionId": "TRN_xxx",
+    "responseCode": "SUCCESS",
+    "responseMessage": "CAPTURED"
   }
 }
 ```
+
+The PHP version answers on `/process-payment.php` and returns `transaction_id`, `amount`, `currency`, `status`, `response_code` and `response_message` in `data` instead.
 
 **Response (Error):**
 ```json
