@@ -145,7 +145,7 @@ app.post('/process-payment', async (req, res) => {
         check.routingNumber = routingNumber;
         check.accountType = accountType;
         check.secCode = SecCode.WEB;
-        check.checkName = req.body.check_holder_name;
+        check.checkHolderName = req.body.check_holder_name;
         check.bankAddress = address;
 
         const response = await check.charge(amount)
