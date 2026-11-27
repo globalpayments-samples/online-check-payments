@@ -219,7 +219,7 @@ public class ProcessPaymentServlet extends HttpServlet {
             check.setRoutingNumber(routingNumber);
             check.setAccountType(accountType);
             check.setSecCode(SecCode.Web);
-            check.setCheckName(checkHolderName);
+            check.setCheckHolderName(checkHolderName);
             check.setBankAddress(address);
 
             Customer customer = new Customer();
