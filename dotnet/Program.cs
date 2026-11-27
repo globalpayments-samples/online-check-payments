@@ -241,7 +241,7 @@ public class Program
                 RoutingNumber = sanitizedRoutingNumber,
                 AccountType = accountType,
                 SecCode = "WEB",
-                CheckName = checkHolderName,
+                CheckHolderName = checkHolderName,
                 BankAddress = address
             };
 
